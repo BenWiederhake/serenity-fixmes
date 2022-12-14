@@ -1,9 +1,6 @@
 cache.json
 tagged_history.csv
 tagged_history.json
-output_day.png
-output_total.png
-
-__pycache__:
-update_counts.cpython-310.pyc
-serenity
+output_*.png
+__pycache__
+/serenity

@@ -1,16 +1,23 @@
 #!/usr/bin/env python3
 
+# There are about 2000 commits in a month, in the recent time.
+# That's about 60 commits per day.
+# 1 second per grep invocation would be quite slow, let's assume that.
+# The other parts of this script are negligible.
+# So this script consumes about 1 minute of CPU time per day.
+# That's acceptable. (Less pessimistic numbers predict about 15 seconds per day.)
+
 import datetime
 import json
 import os.path
 import subprocess
 import time
 
-SERENITY_DIR = "/scratch/serenity/"
+SERENITY_DIR = "serenity/"
 FILENAME_JSON = "tagged_history.json"
 FILENAME_CSV = "tagged_history.csv"
 FILENAME_CACHE = "cache.json"
-FILENAME_CACHE = "cache_cold.json"
+FILENAME_CACHE_COLD = "cache_cold.json"
 # Save the cache only every X commits, instead of after every commit.
 SAVE_CACHE_INV_FREQ = 50
 
@@ -61,7 +68,7 @@ def load_cache():
 
 def save_cache(cache):
     with open(FILENAME_CACHE, "w") as fp:
-        json.dump(cache, fp, sort_keys=True, separators=",:")
+        json.dump(cache, fp, sort_keys=True, separators=",:", indent=0)
 
 
 def count_fixmes(commit):
@@ -104,21 +111,74 @@ def lookup_commit(commit, date, cache):
     )
 
 
+def write_graphs(most_recent_commit):
+    time_now = int(time.time())
+    time_yesterday = time_now - 3600 * 24
+    time_last_week = time_now - 3600 * 24 * 7
+    time_last_month = time_now - 3600 * 24 * 31  # All months are 31 days. Right.
+    time_last_year = time_now - 3600 * 24 * 366  # All years are 366 days. Right.
+    timed_plot_commands = ""
+    if most_recent_commit > time_yesterday:
+        timed_plot_commands += f"""
+            set output "output_day.png"; plot [{time_yesterday}:{time_now}] "tagged_history.csv" using 1:2 with lines;
+        """
+    if most_recent_commit > time_last_week:
+        timed_plot_commands += f"""
+            set output "output_week.png"; plot [{time_last_week}:{time_now}] "tagged_history.csv" using 1:2 with lines;
+        """
+    if most_recent_commit > time_last_month:
+        timed_plot_commands += f"""
+            set output "output_month.png"; plot [{time_last_month}:{time_now}] "tagged_history.csv" using 1:2 with lines;
+        """
+    if most_recent_commit > time_last_year:
+        timed_plot_commands += f"""
+            set output "output_year.png"; plot [{time_last_year}:{time_now}] "tagged_history.csv" using 1:2 with lines;
+        """
+    subprocess.run(
+        [
+            "gnuplot",
+            "-e",
+            f"""
+                set terminal png size 1700,900 enhanced;
+                set xdata time;
+                set timefmt "%s";
+                set xlabel "Time";
+                set format x "%Y-%m-%d %H:%M";
+                set ylabel "Fixmes and todos";
+                set datafile separator ",";
+                set output "output_total.png";
+                plot "tagged_history.csv" using 1:2 with lines;
+                {timed_plot_commands}
+            """,
+        ],
+        check=True,
+    )
+
+
 def run():
+    if not os.path.exists(SERENITY_DIR + "README.md"):
+        print(
+            f"Can't find Serenity checkout at {SERENITY_DIR} , please make sure that a reasonably recent git checkout is at that location."
+        )
+        exit(1)
     fetch_new()
     commits_and_dates = determine_commit_and_date_list()
-    print(f"Newest commits are: ...{commits_and_dates[-3 :]} (time is {time.time()})")
+    print(f"Newest commits are: ...{commits_and_dates[-3 :]}")
+    current_time = int(time.time())
+    print(
+        f"(The time is {current_time}, the last commit is {current_time - commits_and_dates[-1][1]}s ago)"
+    )
     cache = load_cache()
     tagged_commits = [
-        lookup_commit(commit, date, cache) for commit, date in commits_and_dates[:20000]
+        lookup_commit(commit, date, cache) for commit, date in commits_and_dates
     ]
     save_cache(cache)
-    # with open(FILENAME_JSON, "w") as fp:
-    #     json.dump(tagged_commits, fp, sort_keys=True, indent=1)
+    with open(FILENAME_JSON, "w") as fp:
+        json.dump(tagged_commits, fp, sort_keys=True, indent=1)
     with open(FILENAME_CSV, "w") as fp:
         for entry in tagged_commits:
             fp.write(f"{entry['unix_timestamp']},{entry['fixmes']}\n")
-    # FIXME: make_graph(tagged_commits)
+    write_graphs(commits_and_dates[-1][1])
 
 
 if __name__ == "__main__":
