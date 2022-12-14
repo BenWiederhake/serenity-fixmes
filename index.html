@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="description" content="Collection of plots and statistics about how many FIXMEs and TODOs there are in Serenity">
+  <meta name="keywords" content="Serenity, plot, statistics, FIXME, TODO">
+  <title>Serenity FIXMEs and TODOs over time</title>
+  <link rel="canonical" href="https://benwiederhake.github.io/serenity-fixmes/">
+  <link rel="author" href="https://github.com/BenWiederhake">
+  <style>
+    img { max-width: 100%; }
+  </style>
+</head>
+<body>
+  <h2>Serenity migrations over time</h2>
+  <p>That includes Fixmes/Todos, Deprecated(Fly)String, and DeprecatedFile.</p>
+  <h3 id="total">Total</h3>
+  <img src="output_total.png">
+  <img src="output_total_depstr.png">
+  <img src="output_total_depfil.png">
+  <h3 id="year">Last 366 days</h3>
+  <img src="output_year.png">
+  <img src="output_year_depstr.png">
+  <img src="output_year_depfil.png">
+  <h3 id="month">Last 31 days</h3>
+  <img src="output_month.png">
+  <img src="output_month_depstr.png">
+  <h3 id="week"><span id="twodays">Last 7 days</span></h3>
+  <img src="output_week.png">
+  <img src="output_week_depstr.png">
+  <h3 id="downloads">Downloads</h3>
+  <p>
+    You can download the <a href="tagged_history.csv">raw CSV data (about 1 MiB)</a> used for these diagrams.
+  </p>
+  <p>
+    You can tinker with this code at the <a href="https://github.com/BenWiederhake/serenity-fixmes">Github repository</a>.
+    If you want to hot-start your cache, you can use the <a href="cache_v4.json">hot cache used to generate above plots (about 4 MiB)</a>. Not that it's in version 4, so including the counts of DeprecatedString, DeprecatedFlyString, and DeprecatedFile. It is therefore incompatible with the old v1, v2, and v3 caches.
+  </p>
+  <h2 id="links">Other sites to check out:</h2>
+  <p>Statistics:</p>
+  <ul>
+    <li><a href="flamegraph.html">Flamegraph of how the FIXMEs are distributed over the files</a></li>
+    <li><a href="https://github.com/alimpfard/random-serenity-statistics#random-serenityos-statistics">Lines of Code vs. Commits</a></li>
+    <li><a href="https://happy-serenityos.linus.dev/">Happyness statistics</a></li>
+    <li><a href="https://bugs.chromium.org/p/oss-fuzz/issues/list?q=label:Proj-serenity">Unresolved issues found by OSS Fuzz</a></li>
+    <li><a href="https://css.tobyase.de/">Some CSS statistics</a></li>
+    <li><a href="https://fonts.serenityos.net/">Fonts and font statistics</a></li>
+    <li><a href="https://emoji.serenityos.net/">Emoji and emoji statistics</a></li>
+    <li><a href="https://flags.serenityos.net/">Flags and flags statistics</a></li>
+    <li><a href="https://serenityos.net/~xexxa/">Font stuff and Font Editor wishlist</a></li>
+    <li><a href="https://usermap.serenityos.org/">Contributor stats</a></li>
+  </ul>
+  <p>Non-statistics, but still interesting:</p>
+  <ul>
+    <li><a href="https://github.com/SerenityOS/serenity/blob/master/Documentation/Links.md">Links collected in git (contains most of the following links)</a></li>
+    <li><a href="https://wiki.serenityos.net/links.html">Serenity Wiki and even more links</a></li>
+    <li><a href="http://man.serenityos.org/">Serenity Man pages</a></li>
+    <li><a href="https://awesomekling.github.io">Andreas' personal blog</a></li>
+    <li><a href="https://copy.sh/v86/?profile=serenity">Try it out online!</a></li>
+    <li><a href="http://serenityos.social/">Mastodon instance</a> (and its very own <a href="https://grafana.serenityos.social/public-dashboards/42f9a11380614367aa4851076ee6a66b?orgId=1">statistics</a>)</li>
+    <li><a href="https://gelassenheitbs.github.io/Benutzerhandbuch-Internetseite/">Gelassenheits-BS</a></li>
+    <li><a href="https://github.com/kleinesfilmroellchen/serenity-imager">Serenity Image maker</a></li>
+    <li><a href="https://github.com/SerenityOS/serenity-fuzz-corpora/">Files that might be useful starting points for fuzzing</a></li>
+    <li><a href="https://ports.serenityos.net/">Ports</a>, see also <a href="https://github.com/SerenityOS/serenity/blob/master/Ports/AvailablePorts.md">this list</a>.</li>
+    <li><a href="https://serenityos.net/">Wrong page</a>, but still cute andhelpful.</li>
+    <li><a href="https://teespring.com/stores/serenityos?utm_medium=product_shelf&utm_source=youtube&utm_content=YT-AGNkefCob-U_Mq4OnxSUagj77Nz8jYYCc-IuarARfod3YK0765pOaAwNayHAn5Mu6YTyuINDxjU33HWU_eb8Njg6x-XlSo_VxfBNcJFUWOheXkivDRfjrEn-p8J3GFJO7uh8T0qUoWqtdlJHviuwc1AdLRbDbltBe6VuFWlLFWrhihhUk0XmjQ%3D%3D">Serenity merch</a></li>
+    <li><a href="https://www.shadertoy.com/view/7lVXWd">Spinning ladyball</a></li>
+    <li><a href="https://serenity.godbolt.org/">Compiler explorer</a> settings (under Libraries, select "Lagom trunk", and add the compiler option <code>-std=c++20</code>)</li>
+    <li><a href="https://benwiederhake.github.io/freenode-serenity-archive/index.html">Historic quotes</a> from the <code>#serenityos</code> channel on freenode IRC.</li>
+  </ul>
+  <h2>License stuff</h2>
+  <p>This project is licensed under the <a href="https://github.com/BenWiederhake/serenity-fixmes/blob/master/LICENSE">UNLICENSE</a>. Do whatever you want. The data mined by this project is licensed either under the UNLICENSE or the <a href="https://github.com/SerenityOS/serenity/blob/master/LICENSE">BSD License</a>, I'm not sure which, but you can use it in either case.</p>
+  <!-- I personally find it annoying when there's absolutely no free space below a website, so we do this manually: -->
+  <div style="margin: 10rem"></div>
+</body>
+</html>
