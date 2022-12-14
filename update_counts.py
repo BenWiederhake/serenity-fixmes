@@ -20,6 +20,9 @@ FILENAME_CACHE = "cache.json"
 FILENAME_CACHE_COLD = "cache_cold.json"
 # Save the cache only every X commits, instead of after every commit.
 SAVE_CACHE_INV_FREQ = 50
+# *Some* versions of gnuplot use year 2000 as epoch, and in those versions *only*
+# the xrange is interpreted relative to this. Aaargh!
+GNUPLOT_STUPIDITY = 946684800
 
 
 def fetch_new():
@@ -113,6 +116,7 @@ def lookup_commit(commit, date, cache):
 
 def write_graphs(most_recent_commit):
     time_now = int(time.time())
+    print(f"Plotting with {time_now=}")
     time_yesterday = time_now - 3600 * 24
     time_last_week = time_now - 3600 * 24 * 7
     time_last_month = time_now - 3600 * 24 * 31  # All months are 31 days. Right.
@@ -120,19 +124,19 @@ def write_graphs(most_recent_commit):
     timed_plot_commands = ""
     if most_recent_commit > time_yesterday:
         timed_plot_commands += f"""
-            set output "output_day.png"; plot [{time_yesterday}:{time_now}] "tagged_history.csv" using 1:2 with lines;
+            set output "output_day.png"; plot [{time_yesterday - GNUPLOT_STUPIDITY}:{time_now - GNUPLOT_STUPIDITY}] "tagged_history.csv" using 1:2 with lines;
         """
     if most_recent_commit > time_last_week:
         timed_plot_commands += f"""
-            set output "output_week.png"; plot [{time_last_week}:{time_now}] "tagged_history.csv" using 1:2 with lines;
+            set output "output_week.png"; plot [{time_last_week - GNUPLOT_STUPIDITY}:{time_now - GNUPLOT_STUPIDITY}] "tagged_history.csv" using 1:2 with lines;
         """
     if most_recent_commit > time_last_month:
         timed_plot_commands += f"""
-            set output "output_month.png"; plot [{time_last_month}:{time_now}] "tagged_history.csv" using 1:2 with lines;
+            set output "output_month.png"; plot [{time_last_month - GNUPLOT_STUPIDITY}:{time_now - GNUPLOT_STUPIDITY}] "tagged_history.csv" using 1:2 with lines;
         """
     if most_recent_commit > time_last_year:
         timed_plot_commands += f"""
-            set output "output_year.png"; plot [{time_last_year}:{time_now}] "tagged_history.csv" using 1:2 with lines;
+            set output "output_year.png"; plot [{time_last_year - GNUPLOT_STUPIDITY}:{time_now - GNUPLOT_STUPIDITY}] "tagged_history.csv" using 1:2 with lines;
         """
     subprocess.run(
         [
