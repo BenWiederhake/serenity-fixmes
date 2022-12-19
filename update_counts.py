@@ -184,7 +184,7 @@ def generate_flame_graph():
 
     for root, dirs, files in os.walk(".", topdown=False):
         for name in files:
-            if not any(name.endswith(ext) for ext in [".h", ".c", ".cpp"]):
+            if not any(name.endswith(ext) for ext in [".h", ".c", ".cpp", ".html", ".js", ".sh", "*.txt", "*.cmake"]):
                 continue
             node = get_node(os.path.join(root, name))
             if not node:
