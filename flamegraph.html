@@ -1,0 +1,38 @@
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/d3-flame-graph@4.1.3/dist/d3-flamegraph.css">
+</head>
+<body>
+  <div id="todo_chart"></div>
+  <div id="loc_chart"></div>
+  <div id="ratio_chart"></div>
+  <script type="text/javascript" src="https://d3js.org/d3.v7.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/d3-flame-graph@4.1.3/dist/d3-flamegraph.min.js"></script>
+  <script type="text/javascript">
+
+  var todo_chart = flamegraph()
+    .width(960).title("todo");
+
+  d3.json("todo.json")
+    .then(data => {
+      d3.select("#todo_chart")
+        .datum(data)
+        .call(todo_chart);
+    }).catch(error => {
+      return console.warn(error);
+    });
+
+  var loc_chart = flamegraph()
+    .width(960).title("loc");
+
+  d3.json("loc.json")
+    .then(data => {
+      d3.select("#loc_chart")
+        .datum(data)
+        .call(loc_chart);
+    }).catch(error => {
+      return console.warn(error);
+    });
+  </script>
+</body>
+</html>
