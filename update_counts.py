@@ -114,7 +114,7 @@ def lookup_commit(commit, date, cache):
 def write_graphs(most_recent_commit):
     time_now = int(time.time())
     print(f"Plotting with {time_now=}")
-    time_yesterday = time_now - 3600 * 24
+    time_yesterday = time_now - 3600 * 24 * 2
     time_last_week = time_now - 3600 * 24 * 7
     time_last_month = time_now - 3600 * 24 * 31  # All months are 31 days. Right.
     time_last_year = time_now - 3600 * 24 * 366  # All years are 366 days. Right.
