@@ -4,3 +4,5 @@ tagged_history.json
 output_*.png
 __pycache__
 /serenity
+loc.json
+todo.json
