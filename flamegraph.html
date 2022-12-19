@@ -9,7 +9,14 @@
   <meta name="keywords" content="Serenity, plot, statistics, FIXME, TODO">
   <title>Serenity FIXMEs and TODOs, today</title>
   <link rel="canonical" href="https://benwiederhake.github.io/serenity-fixmes/flamegraph.html">
-  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/d3-flame-graph@4.1.3/dist/d3-flamegraph.css">
+  <link rel="stylesheet" type="text/css" href="d3-flamegraph_4.1.3.css">
+  <style>
+  .muted {
+    color: #6c757d;
+    font-size: 80%;
+    font-weight: 400;
+  }
+  </style>
 </head>
 <body>
   <h1>Serenity FIXMEs and TODOs, today</h1>
@@ -17,10 +24,11 @@
   <div id="loc_chart">(loading…)</div>
   <p>Thanks to <a href="https://github.com/BenWiederhake/serenity-fixmes/pull/2">ericLemanissier</a>, who wrote most of this page!</p>
   <p>Wanna see instead how the <a href="index.html">number of FIXMEs evolved over time?</a></p>
-  <script type="text/javascript" src="https://d3js.org/d3.v7.js"></script>
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/d3-flame-graph@4.1.3/dist/d3-flamegraph.min.js"></script>
-  <script type="text/javascript">
+  <p class="muted">The project is released under the <a href="https://github.com/BenWiederhake/serenity-fixmes/blob/master/LICENSE">Unlicense</a>, which allows you to do basically anything. Serenity and its metadata is released under the <a href="https://github.com/SerenityOS/serenity/blob/master/LICENSE">BSD 2-clause license</a>, which allows you to do basically anything. d3 (the JS&amp;CSS library used for above flamegraphs) is licensed under the <a href="https://github.com/d3/d3/blob/main/LICENSE">ISC license</a>, which is <a href="d3_LICENSE.txt">reproduced as part of this webpage</a>.</p>
 
+  <script type="text/javascript" src="d3.v7.7.0.min.js"></script>
+  <script type="text/javascript" src="d3-flamegraph.min.js"></script>
+  <script type="text/javascript">
   var todo_chart = flamegraph()
     .width(960).title("number of fixmes");
 
