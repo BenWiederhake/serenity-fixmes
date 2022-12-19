@@ -9,7 +9,7 @@
 
 import datetime
 import json
-import os.path
+import os
 import subprocess
 import time
 
@@ -159,6 +159,74 @@ def write_graphs(most_recent_commit):
     )
 
 
+def generate_flame_graph():
+    flamegraph = {"name": ".", "children":[]}
+
+    def get_node(path):
+        node = flamegraph
+        for f in os.path.normpath(path).split(os.path.sep):
+            if f in [".git", ".devcontainer"]:
+                return None
+            if "children" not in node:
+                node["children"] = []
+            for child in node["children"]:
+                if child["name"] == f:
+                    node = child
+                    break
+            else:
+                new_node = {"name" : f}
+                node["children"].append(new_node)
+                node = new_node
+        return node
+
+    previous_wd = os.getcwd()
+    os.chdir(SERENITY_DIR)
+
+    for root, dirs, files in os.walk(".", topdown=False):
+        for name in files:
+            if not any(name.endswith(ext) for ext in [".h", ".c", ".cpp"]):
+                continue
+            node = get_node(os.path.join(root, name))
+            if not node:
+                continue
+            todos = 0
+            locs = 0
+            with open(os.path.join(root, name), "rt") as f:
+                for line in f:
+                    line = line.strip().upper()
+                    todos += line.count("FIXME") + line.count("TODO")
+                    if line and not line.startswith("//"):
+                        locs += 1
+            node["todos"] = todos
+            node["locs"] = locs
+
+        for name in dirs:
+            node = get_node(os.path.join(root, name))
+            if not node:
+                continue
+            todos = 0
+            locs = 0
+            for c in node.get("children", []):
+                todos += c["todos"]
+                locs += c["locs"]
+            node["todos"] = todos
+            node["locs"] = locs
+    os.chdir(previous_wd)
+
+    def set_value(calculate, node=flamegraph):
+        node["value"] = calculate(node)
+        for c in node.get("children", []):
+            set_value(calculate, c)
+
+    set_value(lambda node: node.get("todos", 0))
+    with open("todo.json", "wt") as file:
+        json.dump(flamegraph, file)
+
+    set_value(lambda node: node.get("locs", 0))
+    with open("loc.json", "wt") as file:
+        json.dump(flamegraph, file)
+
+
 def run():
     if not os.path.exists(SERENITY_DIR + "README.md"):
         print(
@@ -183,6 +251,8 @@ def run():
         for entry in tagged_commits:
             fp.write(f"{entry['unix_timestamp']},{entry['fixmes']}\n")
     write_graphs(commits_and_dates[-1][1])
+
+    generate_flame_graph()
 
 
 if __name__ == "__main__":
