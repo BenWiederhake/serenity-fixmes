@@ -26,5 +26,7 @@ jobs:
           python-version: "3.8"
           cache: 'pip' # caching pip dependencies
       - run: python3 -m pip install -r requirements.txt
+      - name: Install gnuplot
+        run: sudo apt-get install -y gnuplot-nox
       - name: Generate web page
         run: ./build_and_publish.sh
