@@ -20,9 +20,6 @@ FILENAME_CACHE = "cache.json"
 FILENAME_CACHE_COLD = "cache_cold.json"
 # Save the cache only every X commits, instead of after every commit.
 SAVE_CACHE_INV_FREQ = 50
-# *Some* versions of gnuplot use year 2000 as epoch, and in those versions *only*
-# the xrange is interpreted relative to this. Aaargh!
-GNUPLOT_STUPIDITY = 946684800
 
 
 def fetch_new():
@@ -122,6 +119,16 @@ def write_graphs(most_recent_commit):
     time_last_month = time_now - 3600 * 24 * 31  # All months are 31 days. Right.
     time_last_year = time_now - 3600 * 24 * 366  # All years are 366 days. Right.
     timed_plot_commands = ""
+
+    # *Some* versions of gnuplot use year 2000 as epoch, and in those versions *only*
+    # the xrange is interpreted relative to this. Aaargh!
+    output = subprocess.check_output(['gnuplot', '--version']).split()
+    assert output[0] == b"gnuplot"
+    if int(output[1].split(b".")[0]) < 5:
+        GNUPLOT_STUPIDITY = 946684800
+    else:
+        GNUPLOT_STUPIDITY = 0
+
     if most_recent_commit > time_yesterday:
         timed_plot_commands += f"""
             set output "output_day.png"; plot [{time_yesterday - GNUPLOT_STUPIDITY}:{time_now - GNUPLOT_STUPIDITY}] "tagged_history.csv" using 1:2 with lines;
