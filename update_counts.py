@@ -220,17 +220,20 @@ def generate_flame_graph():
 
     previous_wd = os.getcwd()
     os.chdir(SERENITY_DIR)
+    
+    ratios_list = []
 
     for root, dirs, files in os.walk(".", topdown=False):
         for name in files:
+            full_name = os.path.join(root, name)
             if not any(name.endswith(ext) for ext in [".h", ".c", ".cpp", ".html", ".js", ".sh", "*.txt", "*.cmake"]):
                 continue
-            node = get_node(os.path.join(root, name))
+            node = get_node(full_name)
             if not node:
                 continue
             todos = 0
             locs = 0
-            with open(os.path.join(root, name), "rt") as f:
+            with open(full_name, "rt") as f:
                 for line in f:
                     line = line.strip().upper()
                     todos += line.count("FIXME") + line.count("TODO")
@@ -238,6 +241,16 @@ def generate_flame_graph():
                         locs += 1
             node["todos"] = todos
             node["locs"] = locs
+
+            if todos and locs:
+                if full_name.startswith("./"):
+                    full_name = full_name[2:]
+                ratios_list.append([
+                    todos,
+                    locs,
+                    todos/locs,
+                    full_name
+                ])
 
         for name in dirs:
             node = get_node(os.path.join(root, name))
@@ -276,6 +289,10 @@ def generate_flame_graph():
     loc_graph = set_value(lambda node: node.get("locs", 0), flamegraph)
     with open("loc.json", "wt") as file:
         json.dump(loc_graph, file)
+
+    with open("ratio.csv", "wt") as file:
+        file.write("TODO,LOC,TODO/LOC,FILE\n")
+        file.writelines(f"{e[0]},{e[1]},{e[2]:.2%},{e[3]}\n" for e in ratios_list)
 
 
 def run():
