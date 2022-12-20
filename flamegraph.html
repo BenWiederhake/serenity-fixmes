@@ -21,7 +21,15 @@
 <body>
   <h1>Serenity FIXMEs and TODOs, today</h1>
   <div id="todo_chart">(loading…)</div>
+  <br/>
+  <div id="todo_table"></div>
+  <br/>
   <div id="loc_chart">(loading…)</div>
+  <br/>
+  <div id="loc_table"></div>
+  <br/>
+  <div id="ratio_table"></div>
+  <br/>
   <p>Try clicking on something, the flamechart is interactive!</p>
   <p>Thanks to <a href="https://github.com/BenWiederhake/serenity-fixmes/pull/2">ericLemanissier</a>, who wrote most of this page!</p>
   <p>Wanna see instead how the <a href="index.html">number of FIXMEs evolved over time?</a></p>
@@ -56,6 +64,96 @@
       document.getElementById('loc_chart').firstChild.remove()
     }).catch(error => {
       return console.warn(error);
+    });
+
+    d3.csv("todo.csv").then((rows) => {
+      var table = d3.select("#todo_table").append('table')
+                    .style("border-collapse", "collapse")
+                    .style("border", "2px black solid");
+
+      table.append("thead").append("tr")
+        .selectAll("th")
+        .data(rows.columns)
+        .enter().append("th")
+        .text(d => d)
+        .style("border", "1px black solid")
+        .style("padding", "5px")
+        .style("background-color", "lightgray")
+        .style("font-weight", "bold")
+        .style("text-transform", "uppercase");
+
+      table.append("tbody")
+        .selectAll("tr").data(rows)
+        .enter().append("tr")
+        .selectAll("td")
+        .data(Object.values)
+        .enter().append("td")
+        .style("border", "1px black solid")
+        .style("padding", "5px")
+        .on("mouseover", () => d3.select(this).style("background-color", "powderblue"))
+        .on("mouseout", () => d3.select(this).style("background-color", "white"))
+        .text(d => d)
+        .style("font-size", "12px");
+    });
+
+    d3.csv("loc.csv").then((rows) => {
+      var table = d3.select("#loc_table").append('table')
+                    .style("border-collapse", "collapse")
+                    .style("border", "2px black solid");
+
+      table.append("thead").append("tr")
+        .selectAll("th")
+        .data(rows.columns)
+        .enter().append("th")
+        .text(d => d)
+        .style("border", "1px black solid")
+        .style("padding", "5px")
+        .style("background-color", "lightgray")
+        .style("font-weight", "bold")
+        .style("text-transform", "uppercase");
+
+      table.append("tbody")
+        .selectAll("tr").data(rows)
+        .enter().append("tr")
+        .selectAll("td")
+        .data(Object.values)
+        .enter().append("td")
+        .style("border", "1px black solid")
+        .style("padding", "5px")
+        .on("mouseover", () => d3.select(this).style("background-color", "powderblue"))
+        .on("mouseout", () => d3.select(this).style("background-color", "white"))
+        .text(d => d)
+        .style("font-size", "12px");
+    });
+
+    d3.csv("ratio.csv").then((rows) => {
+      var table = d3.select("#ratio_table").append('table')
+                    .style("border-collapse", "collapse")
+                    .style("border", "2px black solid");
+
+      table.append("thead").append("tr")
+        .selectAll("th")
+        .data(rows.columns)
+        .enter().append("th")
+        .text(d => d)
+        .style("border", "1px black solid")
+        .style("padding", "5px")
+        .style("background-color", "lightgray")
+        .style("font-weight", "bold")
+        .style("text-transform", "uppercase");
+
+      table.append("tbody")
+        .selectAll("tr").data(rows)
+        .enter().append("tr")
+        .selectAll("td")
+        .data(Object.values)
+        .enter().append("td")
+        .style("border", "1px black solid")
+        .style("padding", "5px")
+        .on("mouseover", () => d3.select(this).style("background-color", "powderblue"))
+        .on("mouseout", () => d3.select(this).style("background-color", "white"))
+        .text(d => d)
+        .style("font-size", "12px");
     });
   </script>
 </body>

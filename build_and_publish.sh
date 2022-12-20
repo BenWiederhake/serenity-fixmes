@@ -19,6 +19,9 @@ SOURCES="\
     d3-flamegraph.min.js
     d3-flamegraph_4.1.3.css
     d3.v7.7.0.min.js
+    todo.csv
+    loc.csv
+    ratio.csv
 "
 
 cd -P -- "$(dirname -- "$0")"
