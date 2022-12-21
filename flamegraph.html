@@ -10,6 +10,7 @@
   <title>Serenity FIXMEs and TODOs, today</title>
   <link rel="canonical" href="https://benwiederhake.github.io/serenity-fixmes/flamegraph.html">
   <link rel="stylesheet" type="text/css" href="d3-flamegraph_4.1.3.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css"/>
   <style>
   .muted {
     color: #6c757d;
@@ -21,24 +22,22 @@
 <body>
   <h1>Serenity FIXMEs and TODOs, today</h1>
   <div id="todo_chart">(loading…)</div>
-  <br/>
-  <div id="todo_table"></div>
-  <br/>
   <div id="loc_chart">(loading…)</div>
-  <br/>
-  <div id="loc_table"></div>
-  <br/>
-  <div id="ratio_table"></div>
   <br/>
   <p>Try clicking on something, the flamechart is interactive!</p>
   <p>Thanks to <a href="https://github.com/BenWiederhake/serenity-fixmes/pull/2">ericLemanissier</a>, who wrote most of this page!</p>
   <p>Wanna see instead how the <a href="index.html">number of FIXMEs evolved over time?</a></p>
+  <br/>
+  <table id="todo_table" class="stripe hover order-column row-border compact nowrap" style="width:100%"></table>
+  <br/>
   <p class="muted">The project is released under the <a href="https://github.com/BenWiederhake/serenity-fixmes/blob/master/LICENSE">Unlicense</a>, which allows you to do basically anything. Serenity and its metadata is released under the <a href="https://github.com/SerenityOS/serenity/blob/master/LICENSE">BSD 2-clause license</a>, which allows you to do basically anything. d3 (the JS&amp;CSS library used for above flamegraphs) is licensed under the <a href="https://github.com/d3/d3/blob/main/LICENSE">ISC license</a>, which is <a href="d3_LICENSE.txt">reproduced as part of this webpage</a>.</p>
   <!-- I personally find it annoying when there's absolutely no free space below a website, so we do this manually: -->
   <div style="margin: 5rem"></div>
 
   <script type="text/javascript" src="d3.v7.7.0.min.js"></script>
   <script type="text/javascript" src="d3-flamegraph.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
   <script type="text/javascript">
   var todo_chart = flamegraph()
     .width(960).title("number of fixmes");
@@ -67,9 +66,7 @@
     });
 
     d3.csv("todo.csv").then((rows) => {
-      var table = d3.select("#todo_table").append('table')
-                    .style("border-collapse", "collapse")
-                    .style("border", "2px black solid");
+      var table = d3.select("#todo_table")
 
       table.append("thead").append("tr")
         .selectAll("th")
@@ -94,66 +91,36 @@
         .on("mouseout", () => d3.select(this).style("background-color", "white"))
         .text(d => d)
         .style("font-size", "12px");
-    });
-
-    d3.csv("loc.csv").then((rows) => {
-      var table = d3.select("#loc_table").append('table')
-                    .style("border-collapse", "collapse")
-                    .style("border", "2px black solid");
-
-      table.append("thead").append("tr")
+        
+      table.append("tfoot").append("tr")
         .selectAll("th")
         .data(rows.columns)
         .enter().append("th")
-        .text(d => d)
-        .style("border", "1px black solid")
-        .style("padding", "5px")
-        .style("background-color", "lightgray")
-        .style("font-weight", "bold")
-        .style("text-transform", "uppercase");
-
-      table.append("tbody")
-        .selectAll("tr").data(rows)
-        .enter().append("tr")
-        .selectAll("td")
-        .data(Object.values)
-        .enter().append("td")
-        .style("border", "1px black solid")
-        .style("padding", "5px")
-        .on("mouseover", () => d3.select(this).style("background-color", "powderblue"))
-        .on("mouseout", () => d3.select(this).style("background-color", "white"))
-        .text(d => d)
-        .style("font-size", "12px");
-    });
-
-    d3.csv("ratio.csv").then((rows) => {
-      var table = d3.select("#ratio_table").append('table')
-                    .style("border-collapse", "collapse")
-                    .style("border", "2px black solid");
-
-      table.append("thead").append("tr")
-        .selectAll("th")
-        .data(rows.columns)
-        .enter().append("th")
-        .text(d => d)
-        .style("border", "1px black solid")
-        .style("padding", "5px")
-        .style("background-color", "lightgray")
-        .style("font-weight", "bold")
-        .style("text-transform", "uppercase");
-
-      table.append("tbody")
-        .selectAll("tr").data(rows)
-        .enter().append("tr")
-        .selectAll("td")
-        .data(Object.values)
-        .enter().append("td")
-        .style("border", "1px black solid")
-        .style("padding", "5px")
-        .on("mouseover", () => d3.select(this).style("background-color", "powderblue"))
-        .on("mouseout", () => d3.select(this).style("background-color", "white"))
-        .text(d => d)
-        .style("font-size", "12px");
+        .append("input")
+        .attr("type", "text")
+        .attr("placeholder", d => "Filter " + d)
+        .style("width", "100%")
+        
+      $('#todo_table').DataTable({
+          scrollX: true,
+          scrollY: '80vh',
+          scrollCollapse: true,
+          paging: false,
+          order: [[0, 'desc']],
+          initComplete: function () {
+              // Apply the search
+              this.api()
+                  .columns()
+                  .every(function () {
+                      var that = this;
+                      $('input', this.footer()).on('keyup change clear', function () {
+                          if (that.search() !== this.value) {
+                              that.search(this.value).draw();
+                          }
+                      });
+                  });
+          },
+      });
     });
   </script>
 </body>

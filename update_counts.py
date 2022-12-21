@@ -198,10 +198,8 @@ def generate_flame_graph():
 
     previous_wd = os.getcwd()
     os.chdir(SERENITY_DIR)
-
-    todos_dict = {}
-    locs_dict = {}
-    ratio_dict = {}
+    
+    todos_list = []
 
     for root, dirs, files in os.walk(".", topdown=False):
         for name in files:
@@ -221,17 +219,13 @@ def generate_flame_graph():
                         locs += 1
             node["todos"] = todos
             node["locs"] = locs
-            if todos not in todos_dict:
-                todos_dict[todos] = []
-            todos_dict[todos].append(full_name)
-            if locs not in locs_dict:
-                locs_dict[locs] = []
-            locs_dict[locs].append(full_name)
-            if locs:
-                ratio = todos/locs
-                if ratio not in ratio_dict:
-                    ratio_dict[ratio] = []
-                ratio_dict[ratio].append(full_name)
+
+            todos_list.append([
+                todos,
+                locs,
+                todos/locs if locs else "",
+                full_name
+            ])
 
         for name in dirs:
             node = get_node(os.path.join(root, name))
@@ -271,23 +265,9 @@ def generate_flame_graph():
     with open("loc.json", "wt") as file:
         json.dump(loc_graph, file)
 
-    top = sorted(todos_dict)
-    top.reverse()
     with open("todo.csv", "wt") as file:
-        file.write("TODO,file\n")
-        file.writelines(f"{k},{f}\n" for k in top[0:20] for f in todos_dict[k])
-
-    top = sorted(locs_dict)
-    top.reverse()
-    with open("loc.csv", "wt") as file:
-        file.write("LOC,file\n")
-        file.writelines(f"{k},{f}\n" for k in top[0:20] for f in locs_dict[k])
-
-    top = sorted(ratio_dict)
-    top.reverse()
-    with open("ratio.csv", "wt") as file:
-        file.write("TODO/LOC,file\n")
-        file.writelines(f"{k},{f}\n" for k in top[0:20] for f in ratio_dict[k])
+        file.write("TODO,LOC,TODO/LOC,FILE\n")
+        file.writelines(f"{e[0]},{e[1]},{e[2]},{e[3]}\n" for e in todos_list)
 
 
 def run():
