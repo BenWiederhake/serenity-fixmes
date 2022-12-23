@@ -220,12 +220,13 @@ def generate_flame_graph():
             node["todos"] = todos
             node["locs"] = locs
 
-            todos_list.append([
-                todos,
-                locs,
-                todos/locs if locs else "",
-                full_name
-            ])
+            if todos:
+                todos_list.append([
+                    todos,
+                    locs,
+                    todos/locs if locs else "",
+                    full_name
+                ])
 
         for name in dirs:
             node = get_node(os.path.join(root, name))
