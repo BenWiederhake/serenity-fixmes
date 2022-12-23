@@ -221,6 +221,8 @@ def generate_flame_graph():
             node["locs"] = locs
 
             if todos:
+                if full_name.startswith("./"):
+                    full_name = full_name[2:]
                 todos_list.append([
                     todos,
                     locs,
@@ -268,7 +270,7 @@ def generate_flame_graph():
 
     with open("todo.csv", "wt") as file:
         file.write("TODO,LOC,TODO/LOC,FILE\n")
-        file.writelines(f"{e[0]},{e[1]},{e[2]},{e[3]}\n" for e in todos_list)
+        file.writelines(f"{e[0]},{e[1]},{e[2]:.2%},{e[3]}\n" for e in todos_list)
 
 
 def run():
