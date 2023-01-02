@@ -92,34 +92,12 @@
         .text(d => d)
         .style("font-size", "12px");
         
-      table.append("tfoot").append("tr")
-        .selectAll("th")
-        .data(rows.columns)
-        .enter().append("th")
-        .append("input")
-        .attr("type", "text")
-        .attr("placeholder", d => "Filter " + d)
-        .style("width", "100%")
-        
       $('#todo_table').DataTable({
           scrollX: true,
           scrollY: '80vh',
           scrollCollapse: true,
           paging: false,
           order: [[0, 'desc']],
-          initComplete: function () {
-              // Apply the search
-              this.api()
-                  .columns()
-                  .every(function () {
-                      var that = this;
-                      $('input', this.footer()).on('keyup change clear', function () {
-                          if (that.search() !== this.value) {
-                              that.search(this.value).draw();
-                          }
-                      });
-                  });
-          },
       });
     });
   </script>
