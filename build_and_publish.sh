@@ -20,6 +20,11 @@ SOURCES="\
     d3-flamegraph_4.1.3.css
     d3.v7.7.0.min.js
     todo.csv
+    jquery_LICENSE.txt
+    jquery-3.6.0.slim.min.js
+    datatables_LICENSE.txt
+    jquery.dataTables.min.css
+    jquery.dataTables.min.js
 "
 
 cd -P -- "$(dirname -- "$0")"
