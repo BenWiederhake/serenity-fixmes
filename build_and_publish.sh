@@ -15,7 +15,7 @@ SOURCES="\
     output_year_depstr.png
     tagged_history.json
     tagged_history.csv
-    cache_v2.json
+    cache_v3.json
     index.html
     flamegraph.html
     loc.json
