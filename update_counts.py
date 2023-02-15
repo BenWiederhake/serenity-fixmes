@@ -284,11 +284,11 @@ def generate_flame_graph():
     
     todo_graph = set_value(lambda node: node.get("todos", 0), flamegraph)
     with open("todo.json", "wt") as file:
-        json.dump(todo_graph, file)
+        json.dump(todo_graph, file, separators=",:")
 
     loc_graph = set_value(lambda node: node.get("locs", 0), flamegraph)
     with open("loc.json", "wt") as file:
-        json.dump(loc_graph, file)
+        json.dump(loc_graph, file, separators=",:")
 
     with open("ratio.csv", "wt") as file:
         file.write("TODO,LOC,TODO/LOC,FILE\n")
@@ -314,7 +314,7 @@ def run():
     ]
     save_cache(cache)
     with open(FILENAME_JSON, "w") as fp:
-        json.dump(tagged_commits, fp, sort_keys=True, indent=1)
+        json.dump(tagged_commits, fp, sort_keys=True, indent=0, separators=",:")
     with open(FILENAME_CSV, "w") as fp:
         for entry in tagged_commits:
             fp.write(f"{entry['unix_timestamp']},{entry['fixmes']},{entry['deprecated_strings']}\n")
