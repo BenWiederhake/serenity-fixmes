@@ -147,7 +147,6 @@ def lookup_commit(commit, date, cache):
 def write_graphs(most_recent_commit):
     time_now = int(time.time())
     print(f"Plotting with {time_now=}")
-    time_yesteryesterday = time_now - 3600 * 24 * 2
     time_last_week = time_now - 3600 * 24 * 7
     time_last_month = time_now - 3600 * 24 * 31  # All months are 31 days. Right.
     time_last_year = time_now - 3600 * 24 * 366  # All years are 366 days. Right.
@@ -162,13 +161,6 @@ def write_graphs(most_recent_commit):
     else:
         GNUPLOT_STUPIDITY = 0
 
-    if most_recent_commit > time_yesteryesterday:
-        timed_plot_commands += f"""
-            set output "output_day.png"; plot [{time_yesteryesterday - GNUPLOT_STUPIDITY}:{time_now - GNUPLOT_STUPIDITY}] "tagged_history.csv" using 1:2 with lines title "FIXMEs and TODOs";
-            set output "output_day_depstr.png"; plot [{time_yesteryesterday - GNUPLOT_STUPIDITY}:{time_now - GNUPLOT_STUPIDITY}] "tagged_history.csv" using 1:3 with lines title "DeprecatedStrings+DeprecatedFlyStrings";
-        """
-    else:
-        print(f"WARNING: No commits in the last 2 days?! (now={time_now}, two days ago={time_yesteryesterday}, latest_commit={most_recent_commit})")
     if most_recent_commit > time_last_week:
         timed_plot_commands += f"""
             set output "output_week.png"; plot [{time_last_week - GNUPLOT_STUPIDITY}:{time_now - GNUPLOT_STUPIDITY}] "tagged_history.csv" using 1:2 with lines title "FIXMEs and TODOs";
