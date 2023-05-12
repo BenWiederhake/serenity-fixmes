@@ -16,10 +16,10 @@ import time
 SERENITY_DIR = "serenity/"
 FILENAME_JSON = "tagged_history.json"
 FILENAME_CSV = "tagged_history.csv"
-FILENAME_CACHE = "cache_v3.json"
-FILENAME_CACHE_COLD = "cache_cold_v3.json"
+FILENAME_CACHE = "cache_v4.json"
+FILENAME_CACHE_COLD = "cache_cold_v4.json"
 # Save the cache only every X commits, instead of after every commit.
-SAVE_CACHE_INV_FREQ = 50
+SAVE_CACHE_INV_FREQ = 200
 
 
 def fetch_new():
@@ -71,11 +71,11 @@ def save_cache(cache):
         json.dump(cache, fp, sort_keys=True, separators=",:", indent=0)
 
 
-def count_fixmes(commit):
-    subprocess.run(["git", "-C", SERENITY_DIR, "checkout", "-q", commit], check=True)
+def count_fixmes_here():
     # We don't use "-n" here, since we don't use that information, and less output should make it marginally faster.
+    # That is also why we use "-h".
     result = subprocess.run(
-        ["git", "-C", SERENITY_DIR, "grep", "-IiE", "FIXME|TODO"],
+        ["git", "-C", SERENITY_DIR, "grep", "-IiEh", "FIXME|TODO"],
         check=True,
         capture_output=True,
         text=True,
@@ -85,11 +85,25 @@ def count_fixmes(commit):
     return len(lines)
 
 
-def count_deprecated_strings(commit):
-    subprocess.run(["git", "-C", SERENITY_DIR, "checkout", "-q", commit], check=True)
+def count_deprecated_strings_here():
     # We don't use "-n" here, since we don't use that information, and less output should make it marginally faster.
+    # That is also why we use "-h".
     result = subprocess.run(
-        ["git", "-C", SERENITY_DIR, "grep", "-IiE", "Deprecated(Fly)?String"],
+        ["git", "-C", SERENITY_DIR, "grep", "-IEh", "Deprecated(Fly)?String"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    lines = result.stdout.split("\n")
+    assert lines[-1] == "", result.stdout[-10:]
+    return len(lines)
+
+
+def count_deprecated_files_here():
+    # We don't use "-n" here, since we don't use that information, and less output should make it marginally faster.
+    # That is also why we use "-h".
+    result = subprocess.run(
+        ["git", "-C", SERENITY_DIR, "grep", "-IFh", "DeprecatedFile"],
         check=True,
         capture_output=True,
         text=True,
@@ -101,13 +115,15 @@ def count_deprecated_strings(commit):
 
 def lookup_commit(commit, date, cache):
     if commit in cache:
-        fixmes, deprecated_strings = cache[commit]
+        fixmes, deprecated_strings, deprecated_files = cache[commit]
     else:
         time_start = time.time()
-        fixmes = count_fixmes(commit)
-        deprecated_strings = count_deprecated_strings(commit)
+        subprocess.run(["git", "-C", SERENITY_DIR, "checkout", "-q", commit], check=True)
+        fixmes = count_fixmes_here()
+        deprecated_strings = count_deprecated_strings_here()
+        deprecated_files = count_deprecated_files_here()
         time_done_counting = time.time()
-        cache[commit] = fixmes, deprecated_strings
+        cache[commit] = fixmes, deprecated_strings, deprecated_files
         if len(cache) % SAVE_CACHE_INV_FREQ == 0:
             print("    (actually saving cache)")
             save_cache(cache)
@@ -124,6 +140,7 @@ def lookup_commit(commit, date, cache):
         human_readable_time=human_readable_time,
         fixmes=fixmes,
         deprecated_strings=deprecated_strings,
+        deprecated_files=deprecated_files,
     )
 
 
@@ -317,7 +334,7 @@ def run():
         json.dump(tagged_commits, fp, sort_keys=True, indent=0, separators=",:")
     with open(FILENAME_CSV, "w") as fp:
         for entry in tagged_commits:
-            fp.write(f"{entry['unix_timestamp']},{entry['fixmes']},{entry['deprecated_strings']}\n")
+            fp.write(f"{entry['unix_timestamp']},{entry['fixmes']},{entry['deprecated_strings']},{entry['deprecated_files']}\n")
     write_graphs(commits_and_dates[-1][1])
 
     generate_flame_graph()
