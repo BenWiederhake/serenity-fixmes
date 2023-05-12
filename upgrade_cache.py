@@ -8,11 +8,20 @@ import os
 import subprocess
 import time
 
+# V1: Single number for /FIXME|TODO/i
+# V2: Two numbers for /FIXME|TODO/i and for /DeprecatedString/i
+# V3: Two numbers for /FIXME|TODO/i and for /Deprecated(Fly)?String/i
+# V4: Three numbers for /FIXME|TODO/i and for /Deprecated(Fly)?String/ and for /DeprecatedFile/
+#     (Note that Deprecated(Fly)?String became case-sensitive, but this does not
+#      affect the number of matches as of d7b067e8f7a8c6e52c1b513b8d2a2ded22966376)
+
 SERENITY_DIR = "serenity/"
-FILENAME_CACHE_V2 = "cache_v2.json"
-FILENAME_CACHE_V3 = "cache_v3.json"
-LAST_COMMIT_BEFORE_DEPRECATEDSTRING = "f74251606d74b504a1379ebb893fdb5529054ea5"
+LAST_COMMIT_BEFORE_DEPRECATEDFILE = "14951b92ca6160664ccb68c5e1b2d40133763e5f"
 MAGIC_VERSION_KEY = "0000000000000000000000000000000000000000_version"
+MAGIC_VERSION_VALUE_OLD = 3
+MAGIC_VERSION_VALUE_NEW = 4
+FILENAME_CACHE_OLD = f"cache_v{MAGIC_VERSION_VALUE_OLD}.json"
+FILENAME_CACHE_NEW = f"cache_v{MAGIC_VERSION_VALUE_NEW}.json"
 
 
 def determine_usable_commit_list():
@@ -22,7 +31,7 @@ def determine_usable_commit_list():
             "-C",
             SERENITY_DIR,
             "log",
-            LAST_COMMIT_BEFORE_DEPRECATEDSTRING,
+            LAST_COMMIT_BEFORE_DEPRECATEDFILE,
             "--reverse",
             "--format=%H",
         ],
@@ -41,17 +50,17 @@ def determine_usable_commit_list():
 
 def run():
     commits = determine_usable_commit_list()
-    with open(FILENAME_CACHE_V2, "r") as fp:
+    with open(FILENAME_CACHE_OLD, "r") as fp:
         old_cache = json.load(fp)
-    assert old_cache[MAGIC_VERSION_KEY] == 2
+    assert old_cache[MAGIC_VERSION_KEY] == MAGIC_VERSION_VALUE_OLD
     new_cache = dict()
-    new_cache[MAGIC_VERSION_KEY] = 3
+    new_cache[MAGIC_VERSION_KEY] = MAGIC_VERSION_VALUE_NEW
     for commit in commits:
         old_fixmes, old_deprecatedstring = old_cache[commit]
-        assert old_deprecatedstring == 0
-        new_cache[commit] = [old_fixmes, 0]
-    with open(FILENAME_CACHE_V3, "w") as fp:
+        new_cache[commit] = [old_fixmes, old_deprecatedstring, 0]
+    with open(FILENAME_CACHE_NEW, "w") as fp:
         json.dump(new_cache, fp, sort_keys=True, separators=",:", indent=0)
+    print("Writing complete.")
 
 
 if __name__ == "__main__":
