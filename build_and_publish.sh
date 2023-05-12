@@ -11,6 +11,10 @@ SOURCES="\
     output_week_depstr.png
     output_month_depstr.png
     output_year_depstr.png
+    output_total_depfil.png
+    output_week_depfil.png
+    output_month_depfil.png
+    output_year_depfil.png
     tagged_history.json
     tagged_history.csv
     cache_v3.json
