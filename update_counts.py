@@ -14,7 +14,6 @@ import subprocess
 import time
 
 SERENITY_DIR = "serenity/"
-FILENAME_JSON = "tagged_history.json"
 FILENAME_CSV = "tagged_history.csv"
 FILENAME_CACHE = "cache_v4.json"
 FILENAME_CACHE_COLD = "cache_cold_v4.json"
@@ -327,8 +326,6 @@ def run():
         lookup_commit(commit, date, cache) for commit, date in commits_and_dates
     ]
     save_cache(cache)
-    with open(FILENAME_JSON, "w") as fp:
-        json.dump(tagged_commits, fp, sort_keys=True, indent=0, separators=",:")
     with open(FILENAME_CSV, "w") as fp:
         for entry in tagged_commits:
             fp.write(f"{entry['unix_timestamp']},{entry['fixmes']},{entry['deprecated_strings']},{entry['deprecated_files']}\n")
