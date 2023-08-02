@@ -14,7 +14,7 @@ SOURCES="\
     output_total_depfil.png
     output_year_depfil.png
     tagged_history.csv
-    cache_v3.json
+    cache_v4.json
     index.html
     flamegraph.html
     loc.json
