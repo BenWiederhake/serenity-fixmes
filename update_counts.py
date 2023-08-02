@@ -75,10 +75,11 @@ def count_fixmes_here():
     # That is also why we use "-h".
     result = subprocess.run(
         ["git", "-C", SERENITY_DIR, "grep", "-IiEh", "FIXME|TODO"],
-        check=True,
+        check=False,
         capture_output=True,
         text=True,
     )
+    assert result.returncode in [0, 1]
     lines = result.stdout.split("\n")
     assert lines[-1] == "", result.stdout[-10:]
     return len(lines)
@@ -89,10 +90,11 @@ def count_deprecated_strings_here():
     # That is also why we use "-h".
     result = subprocess.run(
         ["git", "-C", SERENITY_DIR, "grep", "-IEh", "Deprecated(Fly)?String"],
-        check=True,
+        check=False,
         capture_output=True,
         text=True,
     )
+    assert result.returncode in [0, 1]
     lines = result.stdout.split("\n")
     assert lines[-1] == "", result.stdout[-10:]
     return len(lines)
@@ -103,10 +105,11 @@ def count_deprecated_files_here():
     # That is also why we use "-h".
     result = subprocess.run(
         ["git", "-C", SERENITY_DIR, "grep", "-IFh", "DeprecatedFile"],
-        check=True,
+        check=False,
         capture_output=True,
         text=True,
     )
+    assert result.returncode in [0, 1]
     lines = result.stdout.split("\n")
     assert lines[-1] == "", result.stdout[-10:]
     return len(lines)
