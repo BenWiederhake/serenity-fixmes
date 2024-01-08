@@ -242,6 +242,8 @@ def generate_flame_graph():
             full_name = os.path.join(root, name)
             if not any(name.endswith(ext) for ext in [".h", ".c", ".cpp", ".html", ".js", ".sh", "*.txt", "*.cmake"]):
                 continue
+            if full_name in ["./Tests/LibWeb/Layout/input/html-encoding-detection-crash.html"]:
+                continue
             node = get_node(full_name)
             if not node:
                 continue
